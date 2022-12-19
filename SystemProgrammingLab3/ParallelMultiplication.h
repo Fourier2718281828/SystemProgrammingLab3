@@ -40,7 +40,12 @@ void partialMultiply(Matrix<_T, _M, _K>& res,
 	{
 		for (IndexType j = left; j < right; ++j)
 		{
-			res[_K * i + j] = A.row(i) * B.col(j);
+			_T curr_val = 0;
+			for (IndexType k = 0; k < _N; ++k)
+			{
+				curr_val += A[i * _M + k] * B[k * _N + j];
+			}
+			res[_K * i + j] = curr_val;//A.row(i) * B.col(j);
 		}
 	}
 }
@@ -49,14 +54,22 @@ template<typename _T, IndexType _M, IndexType _N, IndexType _K>
 Matrix<_T, _M, _K>* parallelMultiply(const Matrix<_T, _M, _N>& A, const Matrix<_T, _N, _K>& B)
 {
 	Matrix<_T, _M, _K>* res = new Matrix<_T, _M, _K>();
+	std::thread threads[CORES];
 	auto divs = divisions(B);
 
+	int i = 0;
+	std::cout << "Divisions : \n";
 	for (auto [left, right] : divs)
 	{
 		std::cout << "left = " << left << ", right = " << right << ": " << '\n';
-		partialMultiply(*res, A, B, left, right);
+		auto lam = [&res, &A, &B, left, right]() { partialMultiply(*res, A, B, left, right); };
+		threads[i++] = std::thread(lam);
 	}
 
+	for (int i = 0; i < CORES; ++i)
+	{
+		threads[i].join();
+	}
 
 	return res;
 }

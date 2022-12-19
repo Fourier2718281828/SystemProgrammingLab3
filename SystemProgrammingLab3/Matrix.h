@@ -30,21 +30,21 @@ public:
 		}
 	}
 
-	template<std::convertible_to<_T> _U>
-	Matrix(std::initializer_list<_U> list) :
-		Matrix({list})
-	{
-		/*IndexType i = 0u; 
-		auto it = list.begin();
+	//template<std::convertible_to<_T> _U>
+	//Matrix(std::initializer_list<_U> list) :
+	//	Matrix(std::vector{list})
+	//{
+	//	/*IndexType i = 0u; 
+	//	auto it = list.begin();
 
-		for (; i < _array.size() && it != list.end(); ++i, ++it)
-		{
-			_array[i] = static_cast<_T>(*it);
-		}
+	//	for (; i < _array.size() && it != list.end(); ++i, ++it)
+	//	{
+	//		_array[i] = static_cast<_T>(*it);
+	//	}
 
-		if (i < _array.size() || it != list.end())
-			throw IncorrectInputException("Initializer list input cannot fit into matrix container.");*/
-	}
+	//	if (i < _array.size() || it != list.end())
+	//		throw IncorrectInputException("Initializer list input cannot fit into matrix container.");*/
+	//}
 
 	template<std::convertible_to<_T> _U>
 	Matrix(std::vector<_U> list)
@@ -203,6 +203,26 @@ Matrix<_T, _M, _K> operator* (const Matrix<_T, _M, _N>& A, const Matrix<_T, _N, 
 		for (IndexType j = 0; j < _K; ++j)
 		{
 			res[_K * i + j] = A.row(i) * B.col(j);
+		}
+	}
+
+	return res;
+}
+
+template<typename _T, IndexType _M, IndexType _N, IndexType _K>
+Matrix<_T, _M, _K>* heapMultiply (const Matrix<_T, _M, _N>& A, const Matrix<_T, _N, _K>& B)
+{
+	Matrix<_T, _M, _K>* res = new Matrix<_T, _M, _K>();
+	for (IndexType i = 0; i < _M; ++i)
+	{
+		for (IndexType j = 0; j < _K; ++j)
+		{
+			_T resp = 0;
+			for (IndexType k = 0u; k < _N; ++k)
+			{
+				resp += A[i * _M + k] * B[k * _N + j];
+			}
+			(*res)[_K * i + j] = resp;
 		}
 	}
 
