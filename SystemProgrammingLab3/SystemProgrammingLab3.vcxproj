@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="IncorrectInputException.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="ParallelMultiplication.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

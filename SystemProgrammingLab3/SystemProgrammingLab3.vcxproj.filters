@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="IncorrectInputException.h" />
+    <ClInclude Include="ParallelMultiplication.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Exceptions">
