@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <type_traits>
 #include <cassert>
+#include <vector>
 #include <iostream>
 #include "IncorrectInputException.h"
 
@@ -19,12 +20,21 @@ public:
 	using row_iterator = container_type::iterator;
 	using const_row_iterator = container_type::const_iterator;
 public:
-	Matrix() = default;
+	Matrix()
+	{
+		IndexType i = 0u;
+
+		for (; i < _array.size(); ++i)
+		{
+			_array[i] = static_cast<_T>(0);
+		}
+	}
 
 	template<std::convertible_to<_T> _U>
-	Matrix(std::initializer_list<_U> list)
+	Matrix(std::initializer_list<_U> list) :
+		Matrix({list})
 	{
-		IndexType i = 0u; 
+		/*IndexType i = 0u; 
 		auto it = list.begin();
 
 		for (; i < _array.size() && it != list.end(); ++i, ++it)
@@ -33,7 +43,22 @@ public:
 		}
 
 		if (i < _array.size() || it != list.end())
-			throw IncorrectInputException("Initializer list input cannot fit into matrix container.");
+			throw IncorrectInputException("Initializer list input cannot fit into matrix container.");*/
+	}
+
+	template<std::convertible_to<_T> _U>
+	Matrix(std::vector<_U> list)
+	{
+		IndexType i = 0u;
+		auto it = list.begin();
+
+		for (; i < _array.size() && it != list.end(); ++i, ++it)
+		{
+			_array[i] = static_cast<_T>(*it);
+		}
+
+		if (i < _array.size() || it != list.end())
+			throw IncorrectInputException("Vector list input cannot fit into matrix container.");
 	}
 
 	template<std::convertible_to<_T> _U>
@@ -137,7 +162,6 @@ public:
 		for (IndexType i = j; i < size(); i += _N, ++r)
 		{
 			res[r] = _array[i];
-			std::cout << "index: " << i << '\n';
 		}
 		
 		return res;
@@ -194,4 +218,16 @@ _T operator* (const Matrix<_T, 1, _M>& A, const Matrix<_T, _M, 1>& B)
 		res += A[i] * B[i];
 	}
 	return res;
+}
+
+
+template<typename _T, IndexType _M, IndexType _N>
+bool operator==(const Matrix<_T, _M, _N>& A, const Matrix<_T, _M, _N>& B)
+{
+	if (A.size() != B.size()) return false;
+	for (IndexType i = 0; i < A.size(); ++i)
+	{
+		if (A[i] != B[i]) return false;
+	}
+	return true;
 }
